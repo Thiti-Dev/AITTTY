@@ -38,7 +38,17 @@ func CreateAccount(c *fiber.Ctx) error {
 		if r, err := db.Collection("users").InsertOne(ctx, users); err != nil {
 			return helpers.ResponseMsg(c, 500, "Inserted data unsuccesfully", err.Error())
 		} else {
-			return helpers.ResponseMsg(c, 200, "Inserted data succesfully", r)
+			// Anonymous struct
+			respData := struct {
+				CreatedID    interface{}
+				Username	string
+				Email 		string
+			}{
+				r.InsertedID,
+				users.Username,
+				users.Email,
+			}
+			return helpers.ResponseMsg(c, 200, "Inserted data succesfully", respData)
 		}
 	}
 }
