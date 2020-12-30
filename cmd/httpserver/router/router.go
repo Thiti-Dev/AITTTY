@@ -13,6 +13,7 @@ func RoutesSetup(app *fiber.App){
 	api.Get("/",usershandler.StatusCheckAPI)
 
 	//Users API related
-	//userAPI := api.Group("/users")
+	userAPI := api.Group("/accounts")
+	userAPI.Post("/", usershandler.CreateAccount)
 
 }
