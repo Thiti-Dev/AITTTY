@@ -1,3 +1,10 @@
+// ─── WRIITEN AND IDEALIZED BY THITI MAHAWANNAKIT ────────────────────────────────
+/*
+   This can be also designed to have the DI pattern or any other pattern as u desire
+   I created this just for the sake of my comfortable and trying to modulize the logics to be reuseable
+*/
+// ────────────────────────────────────────────────────────────────────────────────
+
 package helpers
 
 import (
