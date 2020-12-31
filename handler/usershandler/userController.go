@@ -59,10 +59,12 @@ func CreateAccount(c *fiber.Ctx) error {
 						CreatedID    interface{}
 						Username	string
 						Email 		string
+						Password    string
 					}{
 						r.InsertedID,
 						users.Username,
 						users.Email,
+						users.Password,
 					}
 					return helpers.ResponseMsg(c, 200, "Inserted data succesfully", respData)
 				}
