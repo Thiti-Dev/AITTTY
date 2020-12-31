@@ -20,7 +20,7 @@ func StatusCheckAPI(c *fiber.Ctx) error {
 
 // CreateAccount -> is the (fn) that will be creating the user account into the database
 func CreateAccount(c *fiber.Ctx) error {
-	users := new(models.Accounts)
+	users := new(models.Accounts) // using new will return an address of created struct
 	var ctx = context.Background()
 
 	db, err := database.Connect()
@@ -36,6 +36,13 @@ func CreateAccount(c *fiber.Ctx) error {
 	if err := c.BodyParser(users); err != nil {
 		return helpers.ResponseMsg(c, 400, err.Error(), nil)
 	} else {
+
+		isValid, errorsData := helpers.ValidateStructAndGetErrorMsg(users)
+
+		if !isValid{
+			return helpers.ResponseMsg(c, 400, "Validation Errors", errorsData) 
+		}
+
 
 		//Check if this email already exist in db or not
 		q := bson.M{"email": users.Email}
