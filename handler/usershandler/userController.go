@@ -8,6 +8,7 @@ import (
 	"github.com/Thiti-Dev/AITTTY/database"
 	"github.com/Thiti-Dev/AITTTY/helpers"
 	"github.com/Thiti-Dev/AITTTY/models"
+	encryptor "github.com/Thiti-Dev/AITTTY/packages/bcrypt"
 	"github.com/gofiber/fiber/v2"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -50,6 +51,13 @@ func CreateAccount(c *fiber.Ctx) error {
 		if result.Err() != nil {
 			// To ensure if document isn't exist
 			if result.Err() == mongo.ErrNoDocuments  { 
+
+				// Encrypt the password
+				hashPwd, _ := encryptor.HashPassword(users.Password)
+				users.Password = hashPwd // replacing plain pwd with encrypted one
+				// • • • • •
+
+
 				//asynchronize task -> passing context to insertion task
 				if r, err := db.Collection("users").InsertOne(ctx, users); err != nil {
 					return helpers.ResponseMsg(c, 500, "Inserted data unsuccesfully", err.Error())
@@ -64,7 +72,7 @@ func CreateAccount(c *fiber.Ctx) error {
 						r.InsertedID,
 						users.Username,
 						users.Email,
-						users.Password,
+						hashPwd,
 					}
 					return helpers.ResponseMsg(c, 200, "Inserted data succesfully", respData)
 				}
