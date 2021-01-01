@@ -2,6 +2,7 @@ package jwt
 
 import (
 	"fmt"
+	"time"
 
 	"github.com/Thiti-Dev/AITTTY/models"
 	"github.com/dgrijalva/jwt-go"
@@ -14,7 +15,7 @@ func GetSignedTokenFromData(data models.RequiredDataToClaims) string{
 		Email: data.Email,
 		ID: data.ID,
 		StandardClaims: jwt.StandardClaims{
-			ExpiresAt: 15000,
+			ExpiresAt: time.Now().Add(time.Hour * 24).Unix(),
 			Issuer:    "aittty.io",
 		},
 	}
