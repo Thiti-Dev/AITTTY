@@ -9,6 +9,7 @@ import (
 	"github.com/Thiti-Dev/AITTTY/helpers"
 	"github.com/Thiti-Dev/AITTTY/models"
 	encryptor "github.com/Thiti-Dev/AITTTY/packages/bcrypt"
+	"github.com/Thiti-Dev/AITTTY/packages/jwt"
 	"github.com/gofiber/fiber/v2"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -83,4 +84,64 @@ func CreateAccount(c *fiber.Ctx) error {
 			return helpers.ResponseMsg(c, 400, "This email is already existed", nil) 
 		}
 	}
+}
+
+// SignInWithCredential -> is the (fn) for signing-in the user and return the token for further usage
+func SignInWithCredential(c *fiber.Ctx) error {
+	//arbitData := make(map[string]interface{}) // -> ignore this (validation still need so i use struct instead)
+	cred := new(models.AccountsSignIn)
+	if err := c.BodyParser(cred); err != nil {
+		return helpers.ResponseMsg(c, 400, err.Error(), nil)
+	}
+
+	// Validation
+	isValid, errorsData := helpers.ValidateStructAndGetErrorMsg(cred)
+	if !isValid{
+		return helpers.ResponseMsg(c, 400, "Validation Errors", errorsData) 
+	}
+	// ────────────────────────────────────────────────────────────────────────────────
+
+	// ─── CREDENTIAL MATCHING PHASE ──────────────────────────────────────────────────
+	var ctx = context.Background()
+
+	db, err := database.Connect()
+	if err != nil {
+		log.Fatal(err.Error())
+	}
+
+	q := bson.M{"email": cred.Email}
+	userData := models.Accounts{}
+	result := db.Collection("users").FindOne(ctx, q)
+	result.Decode(&userData)
+
+	if result.Err() != nil {
+		if result.Err() == mongo.ErrNoDocuments  { 
+			return helpers.ResponseMsg(c, 400, "email or password is incorrect", nil)
+		}else{
+			// any other error
+			return helpers.ResponseMsg(c, 400, "Somethings went wrong", result.Err().Error())
+		}
+	}
+
+	// checking if password are the same between plain&crypted
+	if !encryptor.CheckPasswordHash(cred.Password,userData.Password) {
+		return helpers.ResponseMsg(c, 400, "email or password is incorrect", nil)
+	}
+	 
+	// ────────────────────────────────────────────────────────────────────────────────
+
+
+	// ─── SIGN THE TOKEN FOR USER ────────────────────────────────────────────────────
+	signedToken := jwt.GetSignedTokenFromData(models.RequiredDataToClaims{
+		Username: userData.Username,
+		Email: userData.Email,
+		ID: userData.ID,
+	})
+	// ────────────────────────────────────────────────────────────────────────────────
+	arbitResp := map[string]interface{}{
+		"status": "success",
+		"token": signedToken,
+	}
+	return c.Status(200).JSON(arbitResp)
+	
 }
