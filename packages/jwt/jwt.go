@@ -12,6 +12,7 @@ func GetSignedTokenFromData(data models.RequiredDataToClaims) string{
 	claims := models.CustomClaims{
 		Username: data.Username,
 		Email: data.Email,
+		ID: data.ID,
 		StandardClaims: jwt.StandardClaims{
 			ExpiresAt: 15000,
 			Issuer:    "aittty.io",

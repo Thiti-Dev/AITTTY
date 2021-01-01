@@ -9,6 +9,7 @@ import (
 type CustomClaims struct {
 	Username 	string `json:"username"`
 	Email		string `json:"email"`
+	ID 			primitive.ObjectID `json:"_id"`
 	jwt.StandardClaims
 }
 
