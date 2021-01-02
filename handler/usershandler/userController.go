@@ -2,6 +2,7 @@ package usershandler
 
 import (
 	"context"
+	"log"
 	"time"
 
 	"github.com/Thiti-Dev/AITTTY/database"
@@ -12,6 +13,7 @@ import (
 	"github.com/gofiber/fiber/v2"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 // StatusCheckAPI -> is for checking if the server is properly running at the moment
@@ -137,4 +139,35 @@ func SignInWithCredential(c *fiber.Ctx) error {
 	}
 	return c.Status(200).JSON(arbitResp)
 	
+}
+
+// GetAccounts -> getting all of the accounts existed in the database
+func GetAccounts(c *fiber.Ctx) error {
+	var ctx = context.Background()
+	db := database.GetDatabaseInstance()
+
+	// Also excluding the password field using projection
+	csr, err := db.Collection("users").Find(ctx, bson.M{}, options.Find().SetProjection(bson.M{
+		"password": 0,
+	}))
+	if err != nil {
+		// Doesn't need to send back the error response -> fatal instead (if at somepoint it can't be execute this opreation -> os.exit is the neat way to handle)
+		log.Fatal(err.Error())
+	}
+	defer csr.Close(ctx)
+
+	result := make([]models.Accounts, 0)
+	for csr.Next(ctx) {
+		var row models.Accounts
+		err := csr.Decode(&row)
+		if err != nil {
+			// Doesn't need to send back the error response -> fatal instead (if at somepoint it can't be execute this opreation -> os.exit is the neat way to handle)
+			
+			log.Fatal(err.Error())
+		}
+
+		result = append(result, row)
+	}
+
+	return helpers.ResponseMsg(c, 200, "Get Data Succesfully", result)
 }
