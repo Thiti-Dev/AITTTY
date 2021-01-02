@@ -2,7 +2,6 @@ package usershandler
 
 import (
 	"context"
-	"log"
 	"time"
 
 	"github.com/Thiti-Dev/AITTTY/database"
@@ -25,10 +24,7 @@ func CreateAccount(c *fiber.Ctx) error {
 	users := new(models.Accounts) // using new will return an address of created struct
 	var ctx = context.Background()
 
-	db, err := database.Connect()
-	if err != nil {
-		log.Fatal(err.Error())
-	}
+	db := database.GetDatabaseInstance()
 
 	// Stamping the time
 	users.CreatedAt = time.Now()
@@ -104,10 +100,7 @@ func SignInWithCredential(c *fiber.Ctx) error {
 	// ─── CREDENTIAL MATCHING PHASE ──────────────────────────────────────────────────
 	var ctx = context.Background()
 
-	db, err := database.Connect()
-	if err != nil {
-		log.Fatal(err.Error())
-	}
+	db := database.GetDatabaseInstance()
 
 	q := bson.M{"email": cred.Email}
 	userData := models.Accounts{}
