@@ -1,6 +1,8 @@
 package main
 
 import (
+	"context"
+	"fmt"
 	"log"
 
 	"github.com/Thiti-Dev/AITTTY/cmd/httpserver/router"
@@ -29,4 +31,16 @@ func main() {
 	router.RoutesSetup(app)
 
 	log.Fatal(app.Listen(":3000"))
+
+
+	// ─── DISCONNECT A CONNTECTIN TO DATABASE ────────────────────────────────────────
+	defer func() {
+		err := database.GetDatabaseInstance().Client().Disconnect(context.TODO())
+		if err != nil {
+			log.Fatal(err)
+		}
+		fmt.Println("Connection to MongoDB is closed.")
+	}()
+	// ────────────────────────────────────────────────────────────────────────────────
+
 }
