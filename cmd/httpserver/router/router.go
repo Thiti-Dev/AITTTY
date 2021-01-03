@@ -15,6 +15,7 @@ func RoutesSetup(app *fiber.App){
 	//Users API related
 	userAPI := api.Group("/accounts")
 	userAPI.Get("/", usershandler.GetAccounts)
+	userAPI.Get("/:id", usershandler.GetAccountByID)
 	userAPI.Post("/", usershandler.CreateAccount)
 	userAPI.Post("/authenticate", usershandler.SignInWithCredential)
 

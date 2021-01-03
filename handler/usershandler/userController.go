@@ -12,6 +12,7 @@ import (
 	"github.com/Thiti-Dev/AITTTY/packages/jwt"
 	"github.com/gofiber/fiber/v2"
 	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
@@ -169,5 +170,26 @@ func GetAccounts(c *fiber.Ctx) error {
 		result = append(result, row)
 	}
 
-	return helpers.ResponseMsg(c, 200, "Get Data Succesfully", result)
+	return helpers.ResponseMsg(c, 200, "Get Data Successfully", result)
+}
+
+// GetAccountByID -> get a single account information by ID
+func GetAccountByID(c *fiber.Ctx) error {
+	var ctx = context.Background()
+	db := database.GetDatabaseInstance()
+	_id := c.Params("id")
+
+	if docID, err := primitive.ObjectIDFromHex(_id); err != nil {
+		return helpers.ResponseMsg(c, 400, "Get Data unsuccessfully (invalid ID type)", err.Error())
+	} else {
+		q := bson.M{"_id": docID}
+		users := models.Accounts{}
+		result := db.Collection("users").FindOne(ctx, q)
+		result.Decode(&users)
+		if result.Err() != nil {
+			return helpers.ResponseMsg(c, 400, "Get Data unsuccesfully",result.Err().Error())
+		} else {
+			return helpers.ResponseMsg(c, 200, "Get Data Successfully", users)
+		}
+	}
 }
