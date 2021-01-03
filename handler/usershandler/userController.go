@@ -10,6 +10,7 @@ import (
 	"github.com/Thiti-Dev/AITTTY/models"
 	encryptor "github.com/Thiti-Dev/AITTTY/packages/bcrypt"
 	"github.com/Thiti-Dev/AITTTY/packages/jwt"
+	jwtGOImplementedVer "github.com/form3tech-oss/jwt-go"
 	"github.com/gofiber/fiber/v2"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -192,4 +193,13 @@ func GetAccountByID(c *fiber.Ctx) error {
 			return helpers.ResponseMsg(c, 200, "Get Data Successfully", users)
 		}
 	}
+}
+// AuthorizedCheck -> A check if user is already authorized or not
+func AuthorizedCheck(c *fiber.Ctx) error {
+	// def name is user (if context key leaves as default in fiber/jwt)
+	// Make use of jwtGOImplementedVer from  form3tech-oss because fiber/jwt supports the libs only from that source (satisfied types there)
+	userData := c.Locals("user").(*jwtGOImplementedVer.Token) // cast the value -> because default is undefined so the next line would be blank (lack of knowledge) (need to be pointer cuz it's struct type)
+	claims := userData.Claims.(jwtGOImplementedVer.MapClaims)
+	username := claims["username"].(string)
+	return c.SendString("Welcome " + username)
 }
