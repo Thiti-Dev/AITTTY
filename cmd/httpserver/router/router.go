@@ -2,6 +2,7 @@ package router
 
 import (
 	"github.com/Thiti-Dev/AITTTY/handler/usershandler"
+	"github.com/Thiti-Dev/AITTTY/middlewares"
 	"github.com/gofiber/fiber/v2"
 )
 
@@ -18,5 +19,6 @@ func RoutesSetup(app *fiber.App){
 	userAPI.Get("/:id", usershandler.GetAccountByID)
 	userAPI.Post("/", usershandler.CreateAccount)
 	userAPI.Post("/authenticate", usershandler.SignInWithCredential)
+	userAPI.Get("/authenticate/check", middlewares.ProtectedRoute(),usershandler.AuthorizedCheck)
 
 }
