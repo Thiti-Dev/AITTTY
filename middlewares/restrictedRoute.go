@@ -1,6 +1,7 @@
 package middlewares
 
 import (
+	"github.com/Thiti-Dev/AITTTY/config"
 	"github.com/gofiber/fiber/v2"
 	jwtware "github.com/gofiber/jwt/v2"
 )
@@ -13,6 +14,6 @@ func ProtectedRoute() fiber.Handler{
 				"message": "Unauthorized to visit this route",
 			})
 		},
-		SigningKey: []byte("secureSecretText"),
+		SigningKey: []byte(config.LoadConfig("JWT_SECRET")),
 	})
 }

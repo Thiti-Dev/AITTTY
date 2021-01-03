@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/Thiti-Dev/AITTTY/config"
 	"github.com/Thiti-Dev/AITTTY/models"
 	"github.com/dgrijalva/jwt-go"
 )
@@ -22,7 +23,7 @@ func GetSignedTokenFromData(data models.RequiredDataToClaims) string{
 	// Create an unsigned token from the claims above
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 	// Sign the token ->  preferably at least 256 bits in length (in-production xD)
-	signedToken, err := token.SignedString([]byte("secureSecretText"))
+	signedToken, err := token.SignedString([]byte(config.LoadConfig("JWT_SECRET")))
 	if err != nil {
 		fmt.Println(err)
 	}
