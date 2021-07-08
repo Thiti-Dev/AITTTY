@@ -1,3 +1,5 @@
 ## 🕷️ AITTTY (Am I traveling through time yet)
 
-to be documented later on . . . :pencil:
+This project is archived
+
+Newly implemented with go-gRPC & Angular -> https://github.com/Thiti-Dev/-traveler-
